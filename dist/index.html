@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Interactive, evidence-aware reconstruction of Figures 2–8 from Opening the Black Box of Deep Neural Networks via Information.">
+  <title>Information Plane · Seven Reproductions</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="hero">
+    <nav><span>INFORMATION PLANE LAB</span><a href="#reproductions">Seven reproductions</a><a href="#evidence">Evidence map</a></nav>
+    <div class="hero-grid">
+      <div>
+        <p class="eyebrow">SCHWARTZ-ZIV &amp; TISHBY · FIGURES 2–8</p>
+        <h1>Follow the data<br><em>through training.</em></h1>
+        <p class="lede">One interface connects the paper’s central experiments: representation paths, gradient regimes, network depth, the information bottleneck, sample size, and the alternative-rule test.</p>
+      </div>
+      <aside>
+        <p class="micro">HOW TO USE THIS LAB</p>
+        <p>Choose a paper figure. Move the epoch slider or press play. The visualization, metrics, interpretation, and downloadable MP4 remain synchronized.</p>
+        <div class="rule"></div>
+        <p class="small">Measured points come from saved CSV results. Explanatory-only material is labeled and never presented as reconstructed evidence.</p>
+      </aside>
+    </div>
+  </header>
+
+  <main id="reproductions">
+    <section class="chapter-nav" aria-label="Paper figure navigation">
+      <p class="micro">SELECT A REPRODUCTION</p>
+      <div id="figureTabs" class="tabs">
+        <button data-figure="2" class="active"><b>01</b><span>Figure 2<small>optimization path</small></span></button>
+        <button data-figure="3"><b>02</b><span>Figure 3<small>training fractions</small></span></button>
+        <button data-figure="4"><b>03</b><span>Figure 4<small>gradient regimes</small></span></button>
+        <button data-figure="5"><b>04</b><span>Figure 5<small>depth sweep</small></span></button>
+        <button data-figure="6"><b>05</b><span>Figure 6<small>IB frontier</small></span></button>
+        <button data-figure="7"><b>06</b><span>Figure 7<small>sample size</small></span></button>
+        <button data-figure="8"><b>07</b><span>Figure 8<small>alternative rule</small></span></button>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <div class="section-head">
+        <div><p id="figureKicker" class="eyebrow dark">REPRODUCTION 01 · PAPER FIGURE 2</p><h2 id="figureTitle">The optimization path in the information plane</h2></div>
+        <span id="evidenceBadge" class="badge partial">QUALIFIED RECONSTRUCTION</span>
+      </div>
+
+      <div id="parameterBar" class="parameter-bar">
+        <label id="variantGroup">View
+          <select id="variantSelect"></select>
+        </label>
+        <label class="check"><input id="trailToggle" type="checkbox" checked> Show completed path</label>
+        <button id="resetButton" type="button">Reset</button>
+      </div>
+
+      <div class="stage-grid">
+        <article class="visual-card">
+          <div class="visual-head"><div><p class="micro">DATA TRAJECTORY</p><h3 id="chartTitle">Information plane</h3></div><div class="epoch"><span>epoch</span><strong id="epochReadout">1</strong></div></div>
+          <div id="methodOnly" class="method-only" hidden>
+            <div class="ib-flow"><span>X</span><i>encoder</i><span>T</span><i>decoder</i><span>Ŷ</span></div>
+            <h3>Why Figure 6 is not plotted as a numerical reproduction</h3>
+            <p id="methodReason"></p>
+            <p>The interface therefore teaches the paper’s fixed-point comparison without inventing an IB frontier. This is a stronger scientific result than displaying unsupported coordinates.</p>
+          </div>
+          <canvas id="mainCanvas" role="img" aria-label="Interactive reconstruction chart"></canvas>
+          <div id="layerLegend" class="legend"></div>
+        </article>
+
+        <aside class="explanation">
+          <div class="metric-row"><div><span>test accuracy</span><strong id="accuracyMetric">—</strong></div><div><span>full-data loss</span><strong id="lossMetric">—</strong></div></div>
+          <p class="micro">WHAT THE MOTION MEANS</p>
+          <p id="liveReading" class="live-reading"></p>
+          <dl>
+            <div><dt>Question</dt><dd id="questionText"></dd></div>
+            <div><dt>Method</dt><dd id="methodText"></dd></div>
+            <div><dt>Finding</dt><dd id="findingText"></dd></div>
+            <div><dt>Boundary</dt><dd id="boundaryText"></dd></div>
+          </dl>
+          <a id="videoLink" class="video-link" href="videos/01_figure2_information_plane_trajectory.mp4">▶ Watch narrated reproduction MP4</a>
+        </aside>
+      </div>
+
+      <div id="timeline" class="timeline">
+        <button id="playButton" aria-label="Play trajectory">▶</button>
+        <div><div class="timeline-label"><span>Saved training checkpoint</span><span id="checkpointReadout">1 / 41</span></div><input id="epochSlider" type="range" min="0" value="0"><div class="phase"><span>initial fitting</span><span>transition</span><span>late training</span></div></div>
+        <label>Speed<select id="speedSelect"><option value="850">0.5×</option><option value="480" selected>1×</option><option value="220">2×</option></select></label>
+      </div>
+
+      <div class="secondary-grid">
+        <article class="visual-card"><div class="mini-head"><h3 id="secondaryTitle">Accuracy through training</h3><span id="secondaryCaption">vertical marker follows the selected checkpoint</span></div><canvas id="secondaryCanvas"></canvas></article>
+        <article class="teaching-card"><p class="micro">COURSE CONNECTION</p><h3 id="courseTitle">Mutual information compares unlike layers</h3><p id="courseText"></p><div class="formula"><span>I(X;T)</span><i>retained input information</i><span>I(T;Y)</span><i>retained label information</i></div></article>
+      </div>
+    </section>
+
+    <section id="evidence" class="evidence-section">
+      <div><p class="eyebrow dark">SCIENTIFIC EVIDENCE MAP</p><h2>Reconstruction is not a single yes/no label.</h2></div>
+      <div class="evidence-list">
+        <div><b>Figures 2–3</b><span class="badge supported">SUPPORTED PATTERN</span><p>Saved trajectories reproduce ordered layer motion and the effect of training fraction under the declared estimator.</p></div>
+        <div><b>Figures 4–5 &amp; 7–8</b><span class="badge partial">QUALIFIED</span><p>Modern PyTorch reconstructions use fewer seeds and shorter schedules than the original paper; matching and mismatching behavior is shown.</p></div>
+        <div><b>Figure 6</b><span class="badge limited">NOT NUMERICALLY REPRODUCED</span><p>Essential generative-rule and solver outputs are absent from the released materials, so the interface documents the method and gap.</p></div>
+      </div>
+    </section>
+  </main>
+
+  <footer><span>Three-seed declared reconstructions · 30-bin plug-in MI estimator · saved checkpoints only</span><a href="https://arxiv.org/abs/1703.00810" target="_blank" rel="noreferrer">Read the assigned paper ↗</a></footer>
+  <script src="data.js"></script><script src="app.js"></script>
+</body>
+</html>
