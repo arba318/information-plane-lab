@@ -120,7 +120,7 @@ The supplied notebook and saved long-preset outputs support the following config
 - Result: **23 of 23 code cells completed**, 0 cell errors, 10 PNG figures, and 17 interactive explorer pages.
 - Elapsed clean execution time on the validation machine: 185.3 seconds.
 - The explorer exports embed Plotly directly and contain no external `<script src>` dependency, so the generated HTML pages can be opened offline.
-- `RUN_NOTEBOOK.md` includes direct Colab, macOS/Linux, and Windows PowerShell instructions and explains the quick, standard, long, and paper profiles.
+- `RUN_NOTEBOOK.md` includes direct Colab, macOS/Linux, and Windows PowerShell instructions; a section-by-section notebook map; paper-figure correspondence; profile guidance; output locations; and troubleshooting.
 
 ### PowerPoint
 
@@ -158,4 +158,4 @@ The supplied notebook and saved long-preset outputs support the following config
 | `ITCT_Final_Report.pdf` | `92d09c8de9f84933c5d15623146a320e7efa935b37087e4813d63dd8dcf88a08` |
 | `ITCT_Midterm_Notebook.ipynb` | `71672c3422da1092cfd34e3f2373ed405d677e4a6bac507cc6620c0e6f14d7b0` |
 | `requirements.txt` | `fa1f9405b403fa01b8c23bb23093195ed0ec2feaf2520a7e056cd4adf960202f` |
-| `RUN_NOTEBOOK.md` | `68ef07a02ddbbd874eb0831ca884535271dfbd8eba5f3cb03c72e0ad033f8631` |
+| `RUN_NOTEBOOK.md` | `cab11c30d537e4c5c096b67215c0d1adba71ad37b6f6e590e1b135b7f63e0150` |
