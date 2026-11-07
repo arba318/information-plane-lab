@@ -130,6 +130,8 @@ The supplied notebook and saved long-preset outputs support the following config
 - Slide 4 restores the original four-card claim map (two SGD phases, compression dominance, proximity to the IB bound, and depth-related acceleration) in place of the later screenshot-and-list treatment.
 - Speaker notes were rewritten as technical teaching narration rather than slide captions: 6,335 words total, with 147-289 words per slide and a mean of 186.3 words.
 - The notes explain definitions, derivations, experimental controls, numerical evidence, interpretation limits, and the logical relationship between the four claims.
+- Slide 1 now explicitly identifies the assignment as **REPRODUCING EXPERIMENTAL RESULTS**.
+- Eleven technical slides received native explanatory visuals: entropy overlap, the IB trade-off, fixed-versus-varied controls, both mutual-information derivations, the SNR regimes, layer-wise compression bars, claim-level evidence grades, an evidence-boundary ladder, a control framework, and a three-level final conclusion.
 - Presentation was rendered and visually inspected as a full-slide montage.
 - Slide 28 contains the verified public URL and a scannable QR code linked to the live explorer.
 
@@ -156,7 +158,7 @@ The supplied notebook and saved long-preset outputs support the following config
 |---|---|
 | `ITCT_Reproduction_Demonstration.mp4` | `c3d61a907f0869b5cd7db676c2f261558db51c4203a3e175613df2480a1accfe` |
 | `ITCT_Video_Timestamped_Presenter_Script.pdf` | `a2762cfe6f4645097ff15a97b2b8b14aaf68a5e1de0a8ee0fa5fc3815adaa3c3` |
-| `ITCT_Final_Presentation.pptx` | `408d3930d2ff07aef1e02c96c17f983cf7d3e5b8b63b0773ff0210bc8eedcc6c` |
+| `ITCT_Final_Presentation.pptx` | `bbf19f16ce2ca0f23602e0a3ebd77686a5e5a2c4918b55a477af0cf7b010e383` |
 | `ITCT_Final_Report.pdf` | `92d09c8de9f84933c5d15623146a320e7efa935b37087e4813d63dd8dcf88a08` |
 | `ITCT_Midterm_Notebook.ipynb` | `71672c3422da1092cfd34e3f2373ed405d677e4a6bac507cc6620c0e6f14d7b0` |
 | `requirements.txt` | `fa1f9405b403fa01b8c23bb23093195ed0ec2feaf2520a7e056cd4adf960202f` |
