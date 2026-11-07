@@ -9,7 +9,7 @@ Validation date: 2026-11-08 (Asia/Taipei)
   1. Apple Rose Buhisan Alce (D14949006)
   2. Naveed Ullah (D14949002)
 - Other deliverables preserve the existing order: Naveed Ullah (D14949002), then Apple Rose Buhisan Alce (D14949006).
-- The repository notebook copy lists both contributors in the requested notebook order: Naveed Ullah first, then Apple Rose Buhisan Alce. Experimental code, settings, outputs, and figures were not changed for attribution.
+- The repository notebook copy lists Naveed Ullah first with his CSIE, National Taiwan University affiliation, followed by Apple Rose B. Alce with her RCITI, Academia Sinica affiliation. Experimental code, settings, outputs, and figures were not changed for attribution.
 
 ## Repository and deployment
 
