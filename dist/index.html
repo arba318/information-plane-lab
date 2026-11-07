@@ -3,106 +3,236 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Interactive, evidence-aware reconstruction of Figures 2–8 from Opening the Black Box of Deep Neural Networks via Information.">
-  <title>Information Plane · Seven Reproductions</title>
+  <meta name="description" content="Interactive information-plane reproduction based on the submitted long-preset notebook results.">
+  <meta name="author" content="Apple Rose Buhisan Alce (D14949006); Naveed Ullah (D14949002)">
+  <title>Information Plane Reproduction</title>
+  <link rel="icon" href="data:,">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header class="hero">
-    <nav><span>INFORMATION PLANE LAB</span><a href="#reproductions">Seven reproductions</a><a href="#evidence">Evidence map</a></nav>
-    <div class="hero-grid">
+    <nav aria-label="Primary navigation">
+      <a class="brand" href="#top">INFORMATION PLANE REPRODUCTION</a>
       <div>
-        <p class="eyebrow">SCHWARTZ-ZIV &amp; TISHBY · FIGURES 2–8</p>
-        <h1>Follow the data<br><em>through training.</em></h1>
-        <p class="lede">One interface connects the paper’s central experiments: representation paths, gradient regimes, network depth, the information bottleneck, sample size, and the alternative-rule test.</p>
+        <a href="#overview">Scope</a>
+        <a href="#theory">Theory</a>
+        <a href="#method">Method</a>
+        <a href="#interactive">Training trajectory</a>
+        <a href="#results">Results</a>
+        <a href="#artifacts">Artifacts</a>
       </div>
-      <aside>
-        <p class="micro">HOW TO USE THIS LAB</p>
-        <p>Choose a paper figure. Move the epoch slider or press play. The visualization, metrics, interpretation, and downloadable MP4 remain synchronized.</p>
-        <div class="rule"></div>
-        <p class="small">Measured points come from saved CSV results. Explanatory-only material is labeled and never presented as reconstructed evidence.</p>
-      </aside>
+    </nav>
+    <div id="top" class="hero-content">
+      <p class="eyebrow">ITCT MIDTERM PROJECT · SHWARTZ-ZIV AND TISHBY (2017)</p>
+      <h1>Opening the black box through the information plane</h1>
+      <p class="hero-copy">A from-scratch NumPy reproduction of the paper's small-network experiments, including the fitting and compression trajectory, the SGD phase transition, the Information Bottleneck comparison, depth, sample size, and a second rule.</p>
+      <p class="team"><strong>Apple Rose Buhisan Alce (D14949006)</strong><span>Naveed Ullah (D14949002)</span></p>
+    </div>
+    <div class="hero-facts" aria-label="Long preset configuration">
+      <div><strong>4,096</strong><span>binary input patterns</span></div>
+      <div><strong>20 networks</strong><span>trained in parallel</span></div>
+      <div><strong>10,000 epochs</strong><span>long preset</span></div>
+      <div><strong>30 bins</strong><span>mutual-information estimator</span></div>
     </div>
   </header>
 
-  <main id="reproductions">
-    <section class="chapter-nav" aria-label="Paper figure navigation">
-      <p class="micro">SELECT A REPRODUCTION</p>
-      <div id="figureTabs" class="tabs">
-        <button data-figure="2" class="active"><b>01</b><span>Figure 2<small>optimization path</small></span></button>
-        <button data-figure="3"><b>02</b><span>Figure 3<small>training fractions</small></span></button>
-        <button data-figure="4"><b>03</b><span>Figure 4<small>gradient regimes</small></span></button>
-        <button data-figure="5"><b>04</b><span>Figure 5<small>depth sweep</small></span></button>
-        <button data-figure="6"><b>05</b><span>Figure 6<small>IB frontier</small></span></button>
-        <button data-figure="7"><b>06</b><span>Figure 7<small>sample size</small></span></button>
-        <button data-figure="8"><b>07</b><span>Figure 8<small>alternative rule</small></span></button>
+  <main>
+    <section class="narration-status" aria-label="Narration status">
+      <div><span class="status-dot"></span><strong>Silent experimental demonstration</strong></div>
+      <p>The MP4 intentionally contains no audio. Use the timestamped presenter script for live, student-delivered narration.</p>
+    </section>
+
+    <section id="overview" class="overview-section">
+      <div class="section-heading">
+        <div><p class="eyebrow dark">REPRODUCTION SCOPE</p><h2>One evidence base, four levels of scientific confidence</h2></div>
+        <p>The notebook and its saved outputs determine what is reported here. Original-paper claims are comparison targets, not results that are forced into the reproduction.</p>
+      </div>
+      <div class="evidence-cards">
+        <article><strong>Verified</strong><p>Directly present in notebook code, cached output, or exported figures.</p></article>
+        <article><strong>Derived</strong><p>Computed from verified arrays, such as peak-to-end information loss or an SNR crossing.</p></article>
+        <article><strong>Interpretive</strong><p>A technically plausible explanation presented with an explicit evidence boundary.</p></article>
+        <article><strong>Unverified</strong><p>Not claimed as a result; for example, universal continuous-representation compression.</p></article>
       </div>
     </section>
 
-    <section class="workspace">
-      <div class="section-head">
-        <div><p id="figureKicker" class="eyebrow dark">REPRODUCTION 01 · PAPER FIGURE 2</p><h2 id="figureTitle">The optimization path in the information plane</h2></div>
-        <span id="evidenceBadge" class="badge partial">QUALIFIED RECONSTRUCTION</span>
+    <section id="theory" class="paper-context section-grid">
+      <div>
+        <p class="eyebrow dark">INFORMATION-THEORETIC FOUNDATIONS</p>
+        <h2>The information plane compares unlike layers in the same units</h2>
+        <p>Entropy, <i>H</i>(<i>X</i>) = −Σ<sub>x</sub> <i>p</i>(<i>x</i>) log<sub>2</sub><i>p</i>(<i>x</i>), measures uncertainty in bits. The horizontal coordinate asks how much a quantized representation retains about the input; the vertical coordinate asks how much it retains about the label.</p>
+        <p>For the Markov chain <i>Y</i> → <i>X</i> → <i>T</i><sub>1</sub> → ··· → <i>T</i><sub>L</sub>, data processing constrains information across layers at a fixed network state. It does not require information to decrease monotonically across epochs because the learned mappings change during training.</p>
+        <div class="formula-row">
+          <div><span>I(X;T) = H(T)</span><small>for deterministic, quantized codes in this estimator</small></div>
+          <div><span>I(T;Y) = H(Y) − H(Y|T)</span><small>label information preserved by a representation</small></div>
+          <div><span>L<sub>IB</sub> = I(X;T) − βI(T;Y)</span><small>compression–prediction trade-off</small></div>
+          <div><span>θ<sub>k+1</sub> = θ<sub>k</sub> − ηĝ<sub>k</sub></span><small>plain mini-batch SGD update</small></div>
+        </div>
+        <p class="estimator-warning"><strong>Estimator boundary.</strong> The notebook bins whole-layer activation vectors. A drop in this binned estimate is not automatically an equal drop in the mutual information of the underlying continuous activations.</p>
+      </div>
+      <figure class="reference-figure">
+        <img src="assets/naveed/task.png" alt="Rotation-invariant feature and soft label probabilities from the submitted notebook">
+        <figcaption>Submitted long-preset notebook: task construction and label probabilities</figcaption>
+      </figure>
+    </section>
+
+    <section id="method" class="method-section" data-architecture="12-10-7-5-4-3-2">
+      <div class="section-heading">
+        <div><p class="eyebrow dark">VERIFIED IMPLEMENTATION</p><h2>From all binary inputs to saved layerwise information</h2></div>
+        <p>The main result uses one declared long preset. No browser-side retraining occurs; this site reads the exact saved checkpoints exported from that run.</p>
+      </div>
+      <div class="pipeline" aria-label="Experimental workflow">
+        <article><span>01</span><h3>Dataset</h3><p>Enumerate all 2<sup>12</sup> = 4,096 binary patterns. A rotation-invariant soft rule yields <i>I</i>(<i>X</i>;<i>Y</i>) = 0.990 bits.</p></article>
+        <article><span>02</span><h3>Network</h3><p>Apply affine maps and tanh nonlinearities in a 12–10–7–5–4–3–2 architecture, ending in a two-way softmax.</p></article>
+        <article><span>03</span><h3>Optimization</h3><p>Train 20 independently initialized networks for 10,000 epochs using cross-entropy, manual NumPy backpropagation, η = 0.05, and batch size 1,024.</p></article>
+        <article><span>04</span><h3>Measurement</h3><p>Evaluate every checkpoint over all 4,096 patterns; quantize whole-layer activation vectors into 30 bins and estimate discrete entropies.</p></article>
+      </div>
+      <div class="network-flow" aria-label="Forward computation"><span>X</span><i>affine + tanh</i><span>T<sub>1</sub></span><i>···</i><span>T<sub>6</sub></span><i>softmax</i><span>Ŷ</span></div>
+    </section>
+
+    <section id="interactive" class="interactive-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow dark">EXACT SAVED LONG-PRESET FRAMES</p>
+          <h2>Follow the 20-network ensemble through training</h2>
+        </div>
+        <p>Move the slider in either direction, press Play, and click a legend item to isolate a layer. Every plotted point is a recorded checkpoint from the team-submitted notebook; no intermediate values are invented.</p>
       </div>
 
-      <div id="parameterBar" class="parameter-bar">
-        <label id="variantGroup">View
-          <select id="variantSelect"></select>
-        </label>
-        <label class="check"><input id="trailToggle" type="checkbox" checked> Show completed path</label>
-        <button id="resetButton" type="button">Reset</button>
-      </div>
-
-      <div class="stage-grid">
-        <article class="visual-card">
-          <div class="visual-head"><div><p class="micro">DATA TRAJECTORY</p><h3 id="chartTitle">Information plane</h3></div><div class="epoch"><span>epoch</span><strong id="epochReadout">1</strong></div></div>
-          <div id="methodOnly" class="method-only" hidden>
-            <div class="ib-flow"><span>X</span><i>encoder</i><span>T</span><i>decoder</i><span>Ŷ</span></div>
-            <h3>Why Figure 6 is not plotted as a numerical reproduction</h3>
-            <p id="methodReason"></p>
-            <p>The interface therefore teaches the paper’s fixed-point comparison without inventing an IB frontier. This is a stronger scientific result than displaying unsupported coordinates.</p>
+      <div class="interactive-shell">
+        <div class="plane-panel">
+          <div class="panel-title">
+            <div><span>Information plane</span><small>small points are individual networks; diamonds are layer means</small></div>
+            <div class="epoch-display"><small>epoch</small><strong id="epochReadout">0</strong></div>
           </div>
-          <canvas id="mainCanvas" role="img" aria-label="Interactive reconstruction chart"></canvas>
-          <div id="layerLegend" class="legend"></div>
-        </article>
+          <canvas id="mainCanvas" role="img" aria-label="Information-plane trajectory for the submitted long-preset experiment"></canvas>
+          <div id="layerLegend" class="layer-legend" aria-label="Layer highlighting controls"></div>
+        </div>
 
-        <aside class="explanation">
-          <div class="metric-row"><div><span>test accuracy</span><strong id="accuracyMetric">—</strong></div><div><span>full-data loss</span><strong id="lossMetric">—</strong></div></div>
-          <p class="micro">WHAT THE MOTION MEANS</p>
-          <p id="liveReading" class="live-reading"></p>
+        <aside class="trajectory-reading">
+          <div class="phase-block">
+            <small>current phase</small>
+            <strong id="phaseReadout">drift</strong>
+            <span>transition criterion: geometric-mean gradient SNR falls below 1 at epoch 84</span>
+          </div>
+          <div class="live-metrics">
+            <div><small>output I(X;T)</small><strong id="outputIx">-</strong></div>
+            <div><small>output I(T;Y)</small><strong id="outputIy">-</strong></div>
+            <div><small>available I(X;Y)</small><strong>0.990</strong></div>
+          </div>
+          <p id="liveReading" class="live-reading">At initialization, the layers retain different amounts of input and label information.</p>
           <dl>
-            <div><dt>Question</dt><dd id="questionText"></dd></div>
-            <div><dt>Method</dt><dd id="methodText"></dd></div>
-            <div><dt>Finding</dt><dd id="findingText"></dd></div>
-            <div><dt>Boundary</dt><dd id="boundaryText"></dd></div>
+            <div><dt>Drift phase</dt><dd>The mean mini-batch gradient dominates its fluctuations while predictive information rises.</dd></div>
+            <div><dt>Diffusion phase</dt><dd>Gradient fluctuations dominate. Deeper layers move left under the 30-bin estimator while preserving most label information.</dd></div>
+            <div><dt>Measured conclusion</dt><dd>Four of six layers lose at least 0.5 bit from their peak, using the report's statistical threshold.</dd></div>
           </dl>
-          <a id="videoLink" class="video-link" href="videos/01_figure2_information_plane_trajectory.mp4">▶ Watch narrated reproduction MP4</a>
         </aside>
       </div>
 
-      <div id="timeline" class="timeline">
-        <button id="playButton" aria-label="Play trajectory">▶</button>
-        <div><div class="timeline-label"><span>Saved training checkpoint</span><span id="checkpointReadout">1 / 41</span></div><input id="epochSlider" type="range" min="0" value="0"><div class="phase"><span>initial fitting</span><span>transition</span><span>late training</span></div></div>
-        <label>Speed<select id="speedSelect"><option value="850">0.5×</option><option value="480" selected>1×</option><option value="220">2×</option></select></label>
+      <div class="timeline">
+        <button id="playButton" type="button" aria-label="Play trajectory" aria-pressed="false">▶</button>
+        <div>
+          <div class="timeline-copy"><span>saved checkpoint</span><span id="checkpointReadout">1 / 119</span></div>
+          <input id="epochSlider" type="range" min="0" max="118" value="0" aria-label="Saved training checkpoint">
+          <div class="phase-labels"><span>drift</span><span>epoch 84</span><span>diffusion and compression</span></div>
+        </div>
+        <label>Speed
+          <select id="speedSelect"><option value="700">0.5x</option><option value="360" selected>1x</option><option value="160">2x</option></select>
+        </label>
       </div>
+      <p id="trajectoryStatus" class="sr-only" role="status" aria-live="polite"></p>
+      <p class="checkpoint-note"><strong>Recorded snapshots only.</strong> Playback advances through 119 saved checkpoints. Line segments connect consecutive observations for readability; they are not additional measurements.</p>
 
-      <div class="secondary-grid">
-        <article class="visual-card"><div class="mini-head"><h3 id="secondaryTitle">Accuracy through training</h3><span id="secondaryCaption">vertical marker follows the selected checkpoint</span></div><canvas id="secondaryCanvas"></canvas></article>
-        <article class="teaching-card"><p class="micro">COURSE CONNECTION</p><h3 id="courseTitle">Mutual information compares unlike layers</h3><p id="courseText"></p><div class="formula"><span>I(X;T)</span><i>retained input information</i><span>I(T;Y)</span><i>retained label information</i></div></article>
+      <div class="trend-grid">
+        <article><div><h3>Input information by layer</h3><p>I(X;T) across the saved epochs</p></div><canvas id="ixCanvas"></canvas></article>
+        <article><div><h3>Gradient signal-to-noise ratio</h3><p>the transition occurs where the geometric mean falls below 1</p></div><canvas id="snrCanvas"></canvas></article>
       </div>
     </section>
 
-    <section id="evidence" class="evidence-section">
-      <div><p class="eyebrow dark">SCIENTIFIC EVIDENCE MAP</p><h2>Reconstruction is not a single yes/no label.</h2></div>
-      <div class="evidence-list">
-        <div><b>Figures 2–3</b><span class="badge supported">SUPPORTED PATTERN</span><p>Saved trajectories reproduce ordered layer motion and the effect of training fraction under the declared estimator.</p></div>
-        <div><b>Figures 4–5 &amp; 7–8</b><span class="badge partial">QUALIFIED</span><p>Modern PyTorch reconstructions use fewer seeds and shorter schedules than the original paper; matching and mismatching behavior is shown.</p></div>
-        <div><b>Figure 6</b><span class="badge limited">NOT NUMERICALLY REPRODUCED</span><p>Essential generative-rule and solver outputs are absent from the released materials, so the interface documents the method and gap.</p></div>
+    <section id="results" class="results-section">
+      <div class="section-heading">
+        <div><p class="eyebrow dark">PAPER FIGURES AND TWO CONTROLS</p><h2>What the long-preset run found</h2></div>
+        <p>Select a result to see its submitted figure, numerical result, and the limit on what we can conclude.</p>
       </div>
+      <div id="resultTabs" class="result-tabs" role="tablist" aria-label="Experiment results">
+        <button class="active" data-result="figure2" role="tab">Figure 2</button>
+        <button data-result="figure3" role="tab">Figure 3</button>
+        <button data-result="figure4" role="tab">Figure 4</button>
+        <button data-result="figure5" role="tab">Figure 5</button>
+        <button data-result="figure6" role="tab">Figure 6</button>
+        <button data-result="figure7" role="tab">Figure 7</button>
+        <button data-result="figure8" role="tab">Figure 8</button>
+        <button data-result="relu" role="tab">ReLU control</button>
+        <button data-result="bins" role="tab">Bin sensitivity</button>
+      </div>
+      <div class="result-view">
+        <div class="result-media">
+          <img id="resultImage" src="assets/naveed/figure2.png" alt="Selected result from the submitted notebook">
+          <img id="resultImageSecondary" hidden alt="Additional selected result from the submitted notebook">
+        </div>
+        <article class="result-copy">
+          <p id="resultKicker" class="eyebrow dark">PAPER FIGURE 2</p>
+          <h3 id="resultTitle">Fitting followed by compression</h3>
+          <p id="resultSummary"></p>
+          <div id="resultMetrics" class="result-metrics"></div>
+          <div class="evidence-boundary"><strong>Interpretation boundary</strong><p id="resultBoundary"></p></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="scorecard" class="scorecard-section">
+      <div class="section-heading">
+        <div><p class="eyebrow dark">CLAIM SCORECARD</p><h2>Results do not receive a single yes-or-no label</h2></div>
+        <p>The long run supports the central qualitative picture while qualifying the depth and estimator claims.</p>
+      </div>
+      <div class="score-table" role="table" aria-label="Paper claim scorecard">
+        <div class="score-head" role="row"><span>Claim</span><span>Result</span><span>Evidence</span></div>
+        <div role="row"><strong>Two SGD phases</strong><span class="tag supported">QUALITATIVELY REPRODUCED</span><p>SNR starts at 3.97 and crosses below 1 at epoch 84. The committee-rule run crosses at epoch 75.</p></div>
+        <div role="row"><strong>Compression dominates training</strong><span class="tag supported">DEEPER LAYERS SUPPORTED</span><p>99% of epochs occur after the transition. Layers 3 to 6 lose 0.8 to 5.0 bits after epoch 84.</p></div>
+        <div role="row"><strong>Layers approach the IB bound</strong><span class="tag qualified">LARGELY REPRODUCED</span><p>Mean vertical gap is 0.010 bits, but the wide layers still contain about 10 excess input bits.</p></div>
+        <div role="row"><strong>Depth reduces training time</strong><span class="tag qualified">PARTLY REPRODUCED</span><p>One to three hidden layers gives a 2.9x speed-up. Improvement then saturates and is not monotone.</p></div>
+      </div>
+    </section>
+
+    <section id="limitations" class="limitations-section">
+      <div><p class="eyebrow dark">LIMITATIONS</p><h2>What the experiment cannot establish</h2></div>
+      <ol>
+        <li><span>01</span><p><strong>Generalization gap</strong>The output ends at I(T;Y) = 0.943 of the available 0.990 bits because training uses 85% of the patterns while evaluation uses all 4,096.</p></li>
+        <li><span>02</span><p><strong>Unreported hyperparameters</strong>The paper does not fully specify learning rate and batch size. The submitted run tunes these values to expose a drift phase.</p></li>
+        <li><span>03</span><p><strong>Estimator dependence</strong>Absolute I(X;T) values and the compression of wide layers change with the bin count. ReLU also requires a changing activation range.</p></li>
+        <li><span>04</span><p><strong>Scale and ensemble size</strong>The run uses a small synthetic task, 20 networks rather than 50, and one declared random seed.</p></li>
+        <li><span>05</span><p><strong>Critical slowing down</strong>The paper presents this as a conjecture. The submitted experiment does not test it.</p></li>
+      </ol>
+    </section>
+
+    <section id="artifacts" class="artifacts-section">
+      <div class="section-heading">
+        <div><p class="eyebrow dark">REPRODUCIBILITY RESOURCES</p><h2>Inspect the evidence, not only the conclusion</h2></div>
+        <p>The repository keeps the corrected project notebook, silent demonstration, synchronized narration script, final presentation, and academic report together with this interface.</p>
+      </div>
+      <div class="artifact-grid">
+        <a href="artifacts/ITCT_Midterm_Notebook.ipynb"><strong>Jupyter notebook</strong><span>Implementation and saved outputs</span></a>
+        <a href="artifacts/ITCT_Reproduction_Demonstration.mp4"><strong>Silent MP4</strong><span>10:14 experimental visualization</span></a>
+        <a href="artifacts/ITCT_Video_Timestamped_Presenter_Script.pdf"><strong>Presenter script</strong><span>Exact scene timestamps and narration</span></a>
+        <a href="artifacts/ITCT_Final_Presentation.pptx"><strong>PowerPoint</strong><span>34 slides with embedded speaker notes</span></a>
+        <a href="artifacts/ITCT_Final_Report.pdf"><strong>Academic report</strong><span>Methods, results, limits, and references</span></a>
+        <a href="https://arxiv.org/abs/1703.00810" target="_blank" rel="noreferrer"><strong>Assigned paper ↗</strong><span>Shwartz-Ziv and Tishby (2017)</span></a>
+      </div>
+      <div class="authors-block">
+        <p class="eyebrow dark">CONTRIBUTORS</p>
+        <h3>Apple Rose Buhisan Alce <span>D14949006</span></h3>
+        <h3>Naveed Ullah <span>D14949002</span></h3>
+        <p>Information Theory and Coding Techniques (CSIE7624), Fall 2026 · National Taiwan University</p>
+      </div>
+      <div class="references-block"><p class="eyebrow dark">REFERENCE</p><p>Shwartz-Ziv, R., &amp; Tishby, N. (2017). <i>Opening the black box of deep neural networks via information</i>. arXiv:1703.00810v3. <a href="https://arxiv.org/abs/1703.00810" target="_blank" rel="noreferrer">https://arxiv.org/abs/1703.00810</a></p></div>
     </section>
   </main>
 
-  <footer><span>Three-seed declared reconstructions · 30-bin plug-in MI estimator · saved checkpoints only</span><a href="https://arxiv.org/abs/1703.00810" target="_blank" rel="noreferrer">Read the assigned paper ↗</a></footer>
-  <script src="data.js"></script><script src="app.js"></script>
+  <footer>
+    <span>Apple Rose Buhisan Alce (D14949006) · Naveed Ullah (D14949002)</span>
+    <span>Paper: R. Shwartz-Ziv and N. Tishby, arXiv:1703.00810v3, 2017</span>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

@@ -1,34 +1,181 @@
 (() => {
   'use strict';
-  const DATA = window.REPRO_DATA;
-  const colors = ['#17324c','#286f9f','#168f83','#65a96f','#dda52a','#c65d49','#8d68a8'];
-  const meta = {
-    2:{title:'The optimization path in the information plane',chart:'Layer trajectories across training',status:'QUALIFIED RECONSTRUCTION',badge:'partial',question:'Do hidden layers follow an organized path as the network learns?',method:'A five-hidden-layer tanh network plus its output is evaluated at saved checkpoints. Each whole-layer activation vector is quantized into 30 bins before estimating mutual information.',finding:'The layers form ordered paths. Label information rises during fitting; some layers later move left under this estimator while retaining label information.',boundary:'Three modern PyTorch seeds replace the paper’s 50 legacy runs. The geometry is estimator-dependent.',course:'Entropy turns the distribution of quantized layer states into a common unit: bits. That is why layers with different widths can share one plane.',video:'01_figure2_information_plane_trajectory.mp4'},
-    3:{title:'Training fraction changes the learned representation',chart:'5% versus 85% training data',status:'SUPPORTED PATTERN',badge:'supported',question:'How does the amount of observed training data change the trajectory and endpoint?',method:'The same architecture and estimator are trained on 5% and 85% of all binary patterns. Select either fraction and play the same saved checkpoints.',finding:'More training data supports higher test accuracy and greater label information at the late representation. Small-data training leaves a larger generalization gap.',boundary:'This comparison isolates sample fraction within this implementation; it does not prove that compression causes generalization.',course:'The empirical distribution matters. Mutual information is estimated over the full set of inputs, while parameter learning sees only the selected training subset.',video:'02_figure3_training_fraction_trajectories.mp4'},
-    4:{title:'From directed gradient to noisy late training',chart:'Information path with layerwise gradient diagnostic',status:'QUALIFIED RECONSTRUCTION',badge:'partial',question:'Does training shift from a drift-dominated to a fluctuation-dominated gradient regime?',method:'At every checkpoint, gradients are recomputed on diagnostic mini-batches. For each layer we compare the norm of the mean gradient with the root mean-squared fluctuation around it.',finding:'The gradient signal generally weakens relative to batch variation, but the timing and strength differ by layer and seed.',boundary:'The transition is a diagnostic association, not proof that stochastic diffusion causes information compression.',course:'A stochastic-gradient sample equals its population direction plus mini-batch noise. The plotted ratio shows which term dominates at a checkpoint.',video:'03_figure4_gradient_drift_diffusion.mp4'},
-    5:{title:'Depth changes the speed and shape of learning',chart:'One-to-six hidden-layer sweep',status:'QUALIFIED RECONSTRUCTION',badge:'partial',question:'Do deeper networks reach useful representations in fewer effective training steps?',method:'Six architectures follow the paper’s width pattern: (2), (4,2), …, (12,10,8,6,4,2). Each is trained on 80% of patterns with three seeds.',finding:'Depth changes both the transient path and the rate at which accuracy rises. The deepest models become accurate early in this reconstruction, but performance is not monotone at every checkpoint.',boundary:'The run uses 2,200 rather than 10,000 epochs and three rather than 50 initializations, so it tests the qualitative depth claim only.',course:'Composing transformations changes optimization geometry. Depth is not simply more parameters; it creates intermediate representations through which information can be reorganized.',video:'04_figure5_depth_trajectories.mp4'},
-    6:{title:'The information-bottleneck frontier',chart:'Paper method and reproducibility boundary',status:'NOT NUMERICALLY REPRODUCED',badge:'limited',question:'Do learned layer endpoints approach the optimal compression–prediction trade-off?',method:'The paper compares converged layers with information-bottleneck fixed-point solutions for the original joint distribution P(X,Y).',finding:'The paper reports proximity between learned endpoints and IB curves. Our audit can explain that comparison but cannot regenerate the curve from released assets.',boundary:'The necessary soft P(Y|X), rule parameters, and exact solver output/protocol are missing. Plotting a substitute as the paper’s frontier would be fabrication.',course:'The IB objective trades compression I(X;T) against relevance I(T;Y). A frontier contains optimal representations for different trade-off multipliers β.',video:'05_figure6_ib_frontier_evidence_boundary.mp4'},
-    7:{title:'Training-set size moves the final layer endpoints',chart:'Eight training fractions',status:'QUALIFIED RECONSTRUCTION',badge:'partial',question:'How do converged representations change as the learner sees more of the input space?',method:'A six-hidden-layer network is trained at eight fractions from 3% to 85%. The selector changes fraction; the animation shows how that endpoint is reached.',finding:'Larger subsets generally support higher predictive information and test accuracy, although individual paths and low-data endpoints vary across seeds.',boundary:'The paper averages 50 networks after longer training; this declared reconstruction uses three seeds and 1,600 epochs.',course:'As the empirical sample approaches the population, estimates of the relevant structure stabilize. This links information theory to generalization from finite data.',video:'06_figure7_sample_size_trajectory.mp4'},
-    8:{title:'Alternative-rule stress test',chart:'Released g2 task: paths and gradients',status:'PARTIAL RECONSTRUCTION',badge:'partial',question:'Does the information-plane picture persist under a different input–label rule?',method:'The released g2.mat task is trained with the paper-inspired non-symmetric widths (10,7,5,4,3) for 7,000 epochs and five seeds.',finding:'The information-plane path is recovered and test accuracy reaches about 99%. The paper-like gradient equilibration panel is not recovered cleanly.',boundary:'Repository metadata does not prove that g2.mat is exactly the committee-machine configuration reported in Figure 8, so this is explicitly qualified.',course:'A stress test asks whether a pattern survives a changed data-generating rule. Agreement in one panel and mismatch in another is informative, not a failure to hide.',video:'07_figure8_alternative_rule_trajectory.mp4'}
-  };
-  const state={figure:2,key:null,index:0,playing:false,timer:null,trail:true};
-  const $=id=>document.getElementById(id);
-  const main=$('mainCanvas'),secondary=$('secondaryCanvas'),slider=$('epochSlider');
 
-  function dataset(){return DATA[`figure${state.figure}`]}
-  function keys(){return state.figure===6?[]:Object.keys(dataset()).sort((a,b)=>Number(a)-Number(b))}
-  function series(){return state.figure===6?[]:dataset()[state.key]}
-  function row(){return series()[state.index]}
-  function setupCanvas(canvas){const d=Math.min(devicePixelRatio||1,2),r=canvas.getBoundingClientRect(),w=Math.max(300,Math.round(r.width)),h=Math.max(220,Math.round(r.height));if(canvas.width!==w*d||canvas.height!==h*d){canvas.width=w*d;canvas.height=h*d}const c=canvas.getContext('2d');c.setTransform(d,0,0,d,0,0);c.clearRect(0,0,w,h);c.fillStyle='#fff';c.fillRect(0,0,w,h);return{c,w,h}}
-  function grid(c,b,xt,yt,xm,ym,xf=v=>v,yf=v=>v){c.font='11px Inter,sans-serif';c.strokeStyle='#e1e9e7';c.fillStyle='#6b7b88';c.lineWidth=1;xt.forEach(v=>{let x=xm(v);c.beginPath();c.moveTo(x,b.t);c.lineTo(x,b.b);c.stroke();c.textAlign='center';c.fillText(xf(v),x,b.b+20)});yt.forEach(v=>{let y=ym(v);c.beginPath();c.moveTo(b.l,y);c.lineTo(b.r,y);c.stroke();c.textAlign='right';c.fillText(yf(v),b.l-8,y+4)});c.strokeStyle='#92a3a2';c.beginPath();c.moveTo(b.l,b.t);c.lineTo(b.l,b.b);c.lineTo(b.r,b.b);c.stroke()}
-  function drawPlane(){if(state.figure===6)return;const {c,w,h}=setupCanvas(main),b={l:58,r:w-22,t:18,b:h-52};const xm=v=>b.l+(v/12.2)*(b.r-b.l),ym=v=>b.b-(v/1.05)*(b.b-b.t);grid(c,b,[0,2,4,6,8,10,12],[0,.2,.4,.6,.8,1],xm,ym,v=>v,v=>v.toFixed(1));c.fillStyle='#314656';c.font='600 12px Inter';c.textAlign='center';c.fillText('I(X;T) · retained input information (bits)',(b.l+b.r)/2,h-6);c.save();c.translate(14,(b.t+b.b)/2);c.rotate(-Math.PI/2);c.fillText('I(T;Y) · label information (bits)',0,0);c.restore();const rows=series(),now=row();now.layers.forEach((p,li)=>{if(state.trail){c.beginPath();c.strokeStyle=colors[li%colors.length];c.globalAlpha=.35;c.lineWidth=2;rows.slice(0,state.index+1).forEach((r,i)=>{const q=r.layers[li];if(q)(i?c.lineTo(xm(q.ix),ym(q.iy)):c.moveTo(xm(q.ix),ym(q.iy)))});c.stroke();c.globalAlpha=1}c.beginPath();c.arc(xm(p.ix),ym(p.iy),8,0,Math.PI*2);c.fillStyle=colors[li%colors.length];c.fill();c.strokeStyle='#fff';c.lineWidth=2.5;c.stroke();c.fillStyle='#17324c';c.font='700 10px Inter';c.textAlign='left';c.fillText(`L${li+1}`,xm(p.ix)+10,ym(p.iy)-7)})}
-  function drawSecondary(){if(state.figure===6)return;const {c,w,h}=setupCanvas(secondary),rows=series(),b={l:50,r:w-18,t:15,b:h-42},maxE=rows.at(-1).epoch,xm=v=>b.l+(Math.log10(Math.max(1,v))/Math.log10(maxE))*(b.r-b.l);if(state.figure===4||state.figure===8){const vals=rows.flatMap(r=>r.layers.flatMap(l=>[l.gradient_mean,l.gradient_fluctuation])).filter(v=>v>0),lo=Math.max(1e-8,Math.min(...vals)),hi=Math.max(...vals);const ym=v=>b.b-(Math.log10(Math.max(lo,v))-Math.log10(lo))/(Math.log10(hi)-Math.log10(lo))*(b.b-b.t);grid(c,b,[1,10,100,1000,maxE],[lo,Math.sqrt(lo*hi),hi],xm,ym,v=>v===maxE?String(v):v,v=>v.toExponential(0));row().layers.forEach((_,li)=>{for(const [field,dash] of [['gradient_mean',[]],['gradient_fluctuation',[4,4]]]){c.save();c.setLineDash(dash);c.strokeStyle=colors[li%colors.length];c.lineWidth=field==='gradient_mean'?2:1.3;c.beginPath();rows.forEach((r,i)=>{const v=r.layers[li]?.[field];if(v>0)(i?c.lineTo(xm(r.epoch),ym(v)):c.moveTo(xm(r.epoch),ym(v)))});c.stroke();c.restore()}});c.fillStyle='#667887';c.font='11px Inter';c.fillText('solid = mean gradient · dotted = fluctuation',b.l,b.t+10)}else{const ym=v=>b.b-((v-.3)/.7)*(b.b-b.t);grid(c,b,[1,10,100,maxE],[.4,.6,.8,1],xm,ym,v=>v===maxE?String(v):v,v=>`${Math.round(v*100)}%`);for(const [field,col] of [['train_accuracy','#286f9f'],['test_accuracy','#168f83']]){c.strokeStyle=col;c.lineWidth=2.4;c.beginPath();rows.forEach((r,i)=>i?c.lineTo(xm(r.epoch),ym(r[field])):c.moveTo(xm(r.epoch),ym(r[field])));c.stroke()}}const x=xm(row().epoch);c.strokeStyle='#c65d49';c.lineWidth=1.3;c.beginPath();c.moveTo(x,b.t);c.lineTo(x,b.b);c.stroke()}
-  function describe(){if(state.figure===6)return meta[6].boundary;const r=row(),first=series()[0],last=series().at(-1),progress=state.index/(series().length-1||1);const output=r.layers.at(-1);if(progress<.18)return `Early fitting: test accuracy is ${(r.test_accuracy*100).toFixed(1)}%. The output representation has reached ${output.iy.toFixed(2)} bits of label information.`;if(progress<.65)return `Mid-training: the layers separate into ordered paths. The output now retains ${output.ix.toFixed(2)} bits about X and ${output.iy.toFixed(2)} bits about Y.`;const dx=output.ix-first.layers.at(-1).ix;return `Late training: test accuracy is ${(r.test_accuracy*100).toFixed(1)}%. The output’s I(X;T) changed by ${dx.toFixed(2)} bits from initialization; interpret that change under the declared 30-bin estimator.`}
-  function updateText(){const m=meta[state.figure];$('figureKicker').textContent=`REPRODUCTION ${String(state.figure-1).padStart(2,'0')} · PAPER FIGURE ${state.figure}`;$('figureTitle').textContent=m.title;$('chartTitle').textContent=m.chart;$('evidenceBadge').textContent=m.status;$('evidenceBadge').className=`badge ${m.badge}`;$('questionText').textContent=m.question;$('methodText').textContent=m.method;$('findingText').textContent=m.finding;$('boundaryText').textContent=m.boundary;$('courseText').textContent=m.course;$('videoLink').href=`videos/${m.video}`;$('secondaryTitle').textContent=(state.figure===4||state.figure===8)?'Layerwise gradient mean and fluctuation':'Accuracy through training';if(state.figure===6){$('accuracyMetric').textContent='N/A';$('lossMetric').textContent='N/A';$('epochReadout').textContent='—';$('liveReading').textContent='The paper’s comparison is explainable, but the numerical frontier is not recoverable from the released evidence.';return}const r=row();$('accuracyMetric').textContent=`${(r.test_accuracy*100).toFixed(1)}%`;$('lossMetric').textContent=r.full_loss.toFixed(3);$('epochReadout').textContent=r.epoch.toLocaleString();$('checkpointReadout').textContent=`${state.index+1} / ${series().length}`;$('liveReading').textContent=describe()}
-  function legend(){if(state.figure===6){$('layerLegend').innerHTML='';return}$('layerLegend').innerHTML=row().layers.map((l,i)=>`<span><i style="background:${colors[i%colors.length]}"></i>L${i+1} · ${l.width} unit${l.width===1?'':'s'}</span>`).join('')}
-  function render(){updateText();legend();drawPlane();drawSecondary()}
-  function stop(){state.playing=false;clearInterval(state.timer);state.timer=null;$('playButton').textContent='▶'}
-  function play(){if(state.figure===6)return;if(state.playing){stop();return}state.playing=true;$('playButton').textContent='❚❚';state.timer=setInterval(()=>{if(state.index>=series().length-1){stop();return}state.index++;slider.value=state.index;render()},Number($('speedSelect').value))}
-  function setupFigure(n){stop();state.figure=n;state.index=0;document.querySelectorAll('[data-figure]').forEach(b=>b.classList.toggle('active',Number(b.dataset.figure)===n));const method=n===6;$('methodOnly').hidden=!method;main.hidden=method;$('timeline').hidden=method;$('parameterBar').hidden=method;secondary.closest('.visual-card').hidden=method;$('methodReason').textContent=DATA.figure6.reason;if(!method){const options=keys();state.key=options[n===3?options.length-1:0];$('variantSelect').innerHTML=options.map(k=>`<option value="${k}">${n===5?`${k} hidden layer${k==='1'?'':'s'}`:`${Math.round(Number(k)*100)}% training data`}</option>`).join('');$('variantSelect').value=state.key;slider.max=series().length-1;slider.value=0}$('variantGroup').hidden=n===2||n===4||n===8;render()}
-  document.querySelectorAll('[data-figure]').forEach(b=>b.addEventListener('click',()=>setupFigure(Number(b.dataset.figure))));$('variantSelect').addEventListener('change',e=>{stop();state.key=e.target.value;state.index=0;slider.max=series().length-1;slider.value=0;render()});slider.addEventListener('input',()=>{stop();state.index=Number(slider.value);render()});$('trailToggle').addEventListener('change',e=>{state.trail=e.target.checked;drawPlane()});$('resetButton').addEventListener('click',()=>{stop();state.index=0;slider.value=0;render()});$('playButton').addEventListener('click',play);window.addEventListener('resize',()=>requestAnimationFrame(render));setupFigure(2);
+  const DATA = window.ITCT_DATA.naveed;
+  const COLORS = ['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b'];
+  const WIDTHS = [10,7,5,4,3,2];
+  const state = {index:0, playing:false, timer:null, highlightedLayer:null};
+  const $ = id => document.getElementById(id);
+  const mainCanvas = $('mainCanvas');
+  const ixCanvas = $('ixCanvas');
+  const snrCanvas = $('snrCanvas');
+  const slider = $('epochSlider');
+
+  const RESULTS = {
+    figure2:{kicker:'PAPER FIGURE 2',title:'Fitting followed by compression',image:'figure2.png',summary:'The layers first move upward as they acquire label information. After the drift-to-diffusion transition, the deeper layers move left under the 30-bin estimator while retaining most of their predictive information.',metrics:[['84','transition epoch'],['99%','epochs after transition'],['4 of 6','layers pass the compression threshold'],['0.943 bits','final output I(T;Y)']],boundary:'Layers 1 and 2 remain nearly lossless. The result supports compression for the deeper layers, not every layer.'},
+    figure3:{kicker:'PAPER FIGURE 3',title:'Training data changes the final representation',image:'figure3.png',summary:'The 5%, 45%, and 85% runs follow the same broad path, but more training data raises the predictive information reached by the later layers.',metrics:[['0.277 bits','output I(T;Y), 5%'],['0.811 bits','output I(T;Y), 45%'],['0.943 bits','output I(T;Y), 85%'],['4,096','patterns used for evaluation']],boundary:'The comparison shows association with sample size. It does not establish that compression causes generalization.'},
+    figure4:{kicker:'PAPER FIGURE 4',title:'Drift gives way to gradient fluctuations',image:'figure4.png',summary:'The geometric-mean gradient signal-to-noise ratio starts at 3.97 and falls below one at epoch 84. Weight norms increase, so the observed compression cannot be explained by shrinking weights.',metrics:[['3.97','initial gradient SNR'],['84','transition epoch'],['0.710 to 0.077','cross-entropy, transition to end'],['0.010','noise floor']],boundary:'The learning rate and batch size were not fully specified in the paper. The submitted run tunes them to produce a measurable drift regime.'},
+    figure5:{kicker:'PAPER FIGURE 5',title:'Depth helps, then the gain saturates',image:'figure5.png',secondary:'depth_timing.png',summary:'Two or three hidden layers learn the target information substantially faster than one hidden layer. Adding more layers does not continue to reduce the required epochs.',metrics:[['1,548','epochs to 80%, 1 hidden'],['542','epochs to 80%, 3 hidden'],['2.9x','best speed-up'],['false','monotone with depth']],boundary:'The qualitative benefit of depth is reproduced, but the paper\'s ever-growing super-linear speed-up is not.'},
+    figure6:{kicker:'PAPER FIGURE 6',title:'Converged layers and the IB bound',image:'figure6.png',summary:'The mean vertical gap to the Information Bottleneck curve is small and the inferred beta values decrease with depth. The output layer is close in both axes.',metrics:[['0.010 bits','mean vertical gap'],['0.044 bits','maximum vertical gap'],['0.20 bits','output excess I(X;T)'],['10.55 bits','layer 1 excess I(X;T)']],boundary:'A near-zero vertical gap is weak evidence for the wide layers because the IB curve is flat near I(X;Y). Their large horizontal excess remains important.'},
+    figure7:{kicker:'PAPER FIGURE 7',title:'More training data moves the endpoint upward',image:'figure7.png',summary:'The final output representation contains progressively more label information as the training fraction increases from 3% to 85%.',metrics:[['0.234 bits','output I(T;Y), 3%'],['0.581 bits','output I(T;Y), 20%'],['0.876 bits','output I(T;Y), 60%'],['0.943 bits','output I(T;Y), 85%']],boundary:'Each condition uses 20 networks from one declared long-preset run. The remaining shortfall from 0.990 bits is principally a generalization gap.'},
+    figure8:{kicker:'PAPER FIGURE 8',title:'A second rule shows the same broad phases',image:'figure8.png',summary:'A non-symmetric committee-machine rule and a 12-8-5-3-2 student network also show an early rise in label information followed by leftward motion.',metrics:[['5','committee perceptrons'],['12-8-5-3-2','student architecture'],['75','transition epoch'],['0.990 bits','I(X;Y)']],boundary:'This controlled task supports qualitative generality across two synthetic rules. It does not establish the behavior for large real-world networks.'},
+    relu:{kicker:'ADDITIONAL EXPERIMENT',title:'ReLU also drops under max-scaled binning',image:'relu.png',summary:'With the submitted estimator, five of six ReLU layers and four of six tanh layers lose at least 0.5 bit from their peak.',metrics:[['4 of 6','tanh layers'],['5 of 6','ReLU layers'],['-3.17 bits','ReLU layer 3 drop'],['-2.38 bits','ReLU layer 5 drop']],boundary:'ReLU uses a bin range rescaled to each layer\'s current maximum. Growing outliers can lower the estimate without genuine representational compression, so the result remains inconclusive.'},
+    bins:{kicker:'ADDITIONAL EXPERIMENT',title:'Wide-layer compression depends on bin count',image:'bins.png',summary:'The deeper layers lose information with 10, 30, and 100 bins, while the result for the wide layers changes strongly with estimator resolution.',metrics:[['5 of 6','compressing, 10 bins'],['4 of 6','compressing, 30 bins'],['3 of 6','compressing, 100 bins'],['12 bits','input-information ceiling']],boundary:'Absolute information values cannot be compared across bin counts. Only the within-estimator trajectory shape has a stable meaning.'}
+  };
+
+  function setupCanvas(canvas) {
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    const rect = canvas.getBoundingClientRect();
+    const width = Math.max(320, Math.round(rect.width));
+    const height = Math.max(220, Math.round(rect.height));
+    if (canvas.width !== width * ratio || canvas.height !== height * ratio) {
+      canvas.width = width * ratio;
+      canvas.height = height * ratio;
+    }
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(ratio,0,0,ratio,0,0);
+    ctx.clearRect(0,0,width,height);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0,0,width,height);
+    return {ctx,width,height};
+  }
+
+  function drawAxes(ctx, box, xTicks, yTicks, xMap, yMap, xLabel, yLabel, xFormat=v=>String(v), yFormat=v=>String(v)) {
+    ctx.font = '11px Inter, sans-serif';
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#dfe7e5';
+    ctx.fillStyle = '#6a7d8c';
+    xTicks.forEach(value => {
+      const x = xMap(value);
+      ctx.beginPath(); ctx.moveTo(x,box.t); ctx.lineTo(x,box.b); ctx.stroke();
+      ctx.textAlign = 'center'; ctx.fillText(xFormat(value),x,box.b+19);
+    });
+    yTicks.forEach(value => {
+      const y = yMap(value);
+      ctx.beginPath(); ctx.moveTo(box.l,y); ctx.lineTo(box.r,y); ctx.stroke();
+      ctx.textAlign = 'right'; ctx.fillText(yFormat(value),box.l-8,y+4);
+    });
+    ctx.strokeStyle = '#8ca09f';
+    ctx.beginPath(); ctx.moveTo(box.l,box.t); ctx.lineTo(box.l,box.b); ctx.lineTo(box.r,box.b); ctx.stroke();
+    ctx.fillStyle = '#31485a'; ctx.font = '600 12px Inter, sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(xLabel,(box.l+box.r)/2,box.b+42);
+    ctx.save(); ctx.translate(15,(box.t+box.b)/2); ctx.rotate(-Math.PI/2); ctx.fillText(yLabel,0,0); ctx.restore();
+  }
+
+  function line(ctx, xs, ys, xMap, yMap, color, width=1.5, alpha=1, limit=null) {
+    const count = Math.min(xs.length,ys.length,limit == null ? Infinity : limit);
+    ctx.save(); ctx.strokeStyle=color; ctx.lineWidth=width; ctx.globalAlpha=alpha; ctx.beginPath();
+    let started=false;
+    for(let i=0;i<count;i++){
+      const xv=Number(xs[i]), yv=Number(ys[i]);
+      if(!Number.isFinite(xv)||!Number.isFinite(yv)){started=false;continue}
+      if(!started){ctx.moveTo(xMap(xv),yMap(yv));started=true}else{ctx.lineTo(xMap(xv),yMap(yv))}
+    }
+    ctx.stroke(); ctx.restore();
+  }
+
+  function drawDiamond(ctx,x,y,color,size=7){
+    ctx.save(); ctx.translate(x,y); ctx.rotate(Math.PI/4); ctx.fillStyle=color; ctx.fillRect(-size,-size,size*2,size*2); ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.strokeRect(-size,-size,size*2,size*2); ctx.restore();
+  }
+
+  function drawPlane(){
+    const {ctx,width,height}=setupCanvas(mainCanvas);
+    const box={l:58,r:width-20,t:18,b:height-54};
+    const xMap=v=>box.l+(v/12.5)*(box.r-box.l);
+    const yMap=v=>box.b-(v/1.02)*(box.b-box.t);
+    drawAxes(ctx,box,[0,2,4,6,8,10,12],[0,.2,.4,.6,.8,1],xMap,yMap,'I(X;T) · bits','I(T;Y) · bits',v=>v,v=>v.toFixed(1));
+    line(ctx,DATA.ib_curve.ix,DATA.ib_curve.iy,xMap,yMap,'#2c57d7',2.3,.85);
+    DATA.mean_paths.forEach((path,layer)=>{
+      const selected = state.highlightedLayer === null || state.highlightedLayer === layer;
+      line(ctx,path.ix,path.iy,xMap,yMap,COLORS[layer],selected?1.4:1,.18);
+      line(ctx,path.ix,path.iy,xMap,yMap,COLORS[layer],selected ? 2.8 : 1.2,selected ? .9 : .12,state.index+1);
+    });
+    const frame=DATA.frames[state.index];
+    frame.networks.forEach((network,layer)=>{
+      const selected = state.highlightedLayer === null || state.highlightedLayer === layer;
+      ctx.fillStyle=COLORS[layer]; ctx.globalAlpha=selected ? .42 : .08;
+      network.ix.forEach((x,index)=>{const y=network.iy[index];if(Number.isFinite(x)&&Number.isFinite(y)){ctx.beginPath();ctx.arc(xMap(x),yMap(y),3,0,Math.PI*2);ctx.fill()}});
+      ctx.globalAlpha=1;
+    });
+    ctx.save(); ctx.setLineDash([5,5]); ctx.strokeStyle='#7a8b99'; ctx.lineWidth=1.4; ctx.beginPath();
+    frame.means.forEach((point,index)=>index?ctx.lineTo(xMap(point.ix),yMap(point.iy)):ctx.moveTo(xMap(point.ix),yMap(point.iy))); ctx.stroke(); ctx.restore();
+    frame.means.forEach((point,layer)=>{
+      ctx.save();
+      if(state.highlightedLayer !== null && state.highlightedLayer !== layer) ctx.globalAlpha=.18;
+      drawDiamond(ctx,xMap(point.ix),yMap(point.iy),COLORS[layer],state.highlightedLayer===layer?9:7);
+      ctx.restore();
+    });
+  }
+
+  function drawIx(){
+    const {ctx,width,height}=setupCanvas(ixCanvas); const box={l:50,r:width-16,t:16,b:height-42};
+    const maxLog=Math.log10(DATA.epochs+1), xMap=v=>box.l+(Math.log10(Math.max(1,v))/maxLog)*(box.r-box.l), yMap=v=>box.b-(v/12.2)*(box.b-box.t);
+    drawAxes(ctx,box,[1,10,100,1000,10000],[0,3,6,9,12],xMap,yMap,'epoch','I(X;T)',v=>v===10000?'10k':String(v),v=>String(v));
+    DATA.ix_by_epoch.forEach((series,layer)=>line(ctx,series.epoch,series.value,xMap,yMap,COLORS[layer],1.8,.9));
+    const x=xMap(DATA.frames[state.index].epoch+1);ctx.strokeStyle='#c85f4a';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(x,box.t);ctx.lineTo(x,box.b);ctx.stroke();
+  }
+
+  function drawSnr(){
+    const {ctx,width,height}=setupCanvas(snrCanvas); const box={l:50,r:width-16,t:16,b:height-42};
+    const maxLog=Math.log10(DATA.epochs+1), lo=-1.5, hi=1.2;
+    const xMap=v=>box.l+(Math.log10(Math.max(1,v))/maxLog)*(box.r-box.l), yMap=v=>box.b-(Math.log10(Math.max(.03,v))-lo)/(hi-lo)*(box.b-box.t);
+    drawAxes(ctx,box,[1,10,100,1000,10000],[.1,1,10],xMap,yMap,'epoch','gradient SNR',v=>v===10000?'10k':String(v),v=>String(v));
+    DATA.snr_by_epoch.forEach((series,layer)=>line(ctx,series.epoch,series.value,xMap,yMap,COLORS[layer],1.6,.9));
+    ctx.save();ctx.setLineDash([4,4]);ctx.strokeStyle='#172f46';ctx.beginPath();ctx.moveTo(box.l,yMap(1));ctx.lineTo(box.r,yMap(1));ctx.stroke();ctx.restore();
+    const tx=xMap(DATA.transition_epoch+1);ctx.save();ctx.setLineDash([3,4]);ctx.strokeStyle='#d99b26';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(tx,box.t);ctx.lineTo(tx,box.b);ctx.stroke();ctx.restore();
+    const x=xMap(DATA.frames[state.index].epoch+1);ctx.strokeStyle='#c85f4a';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(x,box.t);ctx.lineTo(x,box.b);ctx.stroke();
+  }
+
+  function updateText(){
+    const frame=DATA.frames[state.index], epoch=frame.epoch, output=frame.means.at(-1), phase=epoch<DATA.transition_epoch?'drift':'diffusion';
+    $('epochReadout').textContent=epoch.toLocaleString(); $('phaseReadout').textContent=phase;
+    $('outputIx').textContent=output.ix.toFixed(3); $('outputIy').textContent=output.iy.toFixed(3);
+    $('checkpointReadout').textContent=`${state.index+1} / ${DATA.frames.length}`;
+    if(epoch===0){$('liveReading').textContent='At initialization, the six layers occupy different positions because their widths constrain how many activation codes they can form.'}
+    else if(epoch<DATA.transition_epoch){$('liveReading').textContent=`At epoch ${epoch.toLocaleString()}, the mean stochastic gradient still dominates its fluctuations. Label information rises as the network fits the rule.`}
+    else if(epoch<1000){$('liveReading').textContent=`At epoch ${epoch.toLocaleString()}, the run is past the SNR transition. The deeper layers continue acquiring label information while beginning their leftward motion.`}
+    else{$('liveReading').textContent=`At epoch ${epoch.toLocaleString()}, the deeper layers have moved toward lower I(X;T) while remaining near the task's 0.990-bit label-information ceiling.`}
+    const layerText=state.highlightedLayer===null?'all layers':`layer ${state.highlightedLayer+1}`;
+    $('trajectoryStatus').textContent=`Epoch ${epoch}, ${phase} phase, checkpoint ${state.index+1} of ${DATA.frames.length}, showing ${layerText}.`;
+  }
+
+  function render(){drawPlane();drawIx();drawSnr();updateText()}
+  function stop(){state.playing=false;clearInterval(state.timer);state.timer=null;$('playButton').textContent='▶';$('playButton').setAttribute('aria-pressed','false');$('playButton').setAttribute('aria-label','Play trajectory')}
+  function play(){if(state.playing){stop();return}if(state.index>=DATA.frames.length-1){state.index=0;slider.value=0}state.playing=true;$('playButton').textContent='❚❚';$('playButton').setAttribute('aria-pressed','true');$('playButton').setAttribute('aria-label','Pause trajectory');state.timer=setInterval(()=>{if(state.index>=DATA.frames.length-1){stop();return}state.index++;slider.value=state.index;render()},Number($('speedSelect').value))}
+
+  function refreshLegend(){document.querySelectorAll('[data-layer]').forEach(button=>{const layer=Number(button.dataset.layer),active=state.highlightedLayer===layer;button.classList.toggle('active',active);button.classList.toggle('dimmed',state.highlightedLayer!==null&&!active);button.setAttribute('aria-pressed',String(active))})}
+
+  function buildLegend(){
+    const host=$('layerLegend');
+    WIDTHS.forEach((width,index)=>{
+      const item=document.createElement('button'),dot=document.createElement('i');
+      item.type='button'; item.dataset.layer=String(index); item.setAttribute('aria-pressed','false');
+      item.setAttribute('aria-label',`Highlight layer ${index+1}, width ${width}`);
+      dot.style.background=COLORS[index];
+      item.append(dot,document.createTextNode(`Layer ${index+1} · width ${width}`));
+      item.addEventListener('click',()=>{state.highlightedLayer=state.highlightedLayer===index?null:index;refreshLegend();render()});
+      host.append(item);
+    });
+  }
+
+  function showResult(key){
+    const result=RESULTS[key]; document.querySelectorAll('[data-result]').forEach(button=>{const active=button.dataset.result===key;button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active))});
+    $('resultKicker').textContent=result.kicker; $('resultTitle').textContent=result.title; $('resultSummary').textContent=result.summary; $('resultBoundary').textContent=result.boundary;
+    $('resultImage').src=`assets/naveed/${result.image}`; $('resultImage').alt=`${result.title}, submitted notebook result`;
+    const second=$('resultImageSecondary'); if(result.secondary){second.hidden=false;second.src=`assets/naveed/${result.secondary}`;second.alt=`${result.title}, timing comparison`}else{second.hidden=true;second.removeAttribute('src')}
+    const metrics=$('resultMetrics');metrics.replaceChildren();result.metrics.forEach(([value,label])=>{const box=document.createElement('div'),strong=document.createElement('strong'),small=document.createElement('small');strong.textContent=value;small.textContent=label;box.append(strong,small);metrics.append(box)});
+  }
+
+  const query = new URLSearchParams(window.location.search);
+  const requestedFrame = Number(query.get('frame'));
+  const requestedResult = RESULTS[query.get('result')] ? query.get('result') : 'figure2';
+  if(Number.isInteger(requestedFrame)) state.index=Math.max(0,Math.min(DATA.frames.length-1,requestedFrame));
+  buildLegend();
+  slider.max=DATA.frames.length-1;
+  slider.value=state.index;
+  slider.addEventListener('input',()=>{stop();state.index=Number(slider.value);render()});
+  $('playButton').addEventListener('click',play);
+  document.querySelectorAll('[data-result]').forEach(button=>button.addEventListener('click',()=>showResult(button.dataset.result)));
+  window.addEventListener('resize',()=>window.requestAnimationFrame(render));
+  showResult(requestedResult); render();
 })();
