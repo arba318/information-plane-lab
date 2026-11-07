@@ -19,7 +19,8 @@ Validation date: 2026-11-08 (Asia/Taipei)
 - Published project directory: https://github.com/arba318/arba318.github.io/tree/main/itct-midterm
 - Live GitHub Pages URL: https://arba318.github.io/itct-midterm/
 - First verified deployed commit: `1f89125` (`Publish ITCT information-plane reproduction`)
-- GitHub Pages workflow run `42408890216` completed successfully. The public project URL returned HTTP 200 and exposed the required authorship, explorer, results, and downloadable artifacts.
+- Verified final artifact-bearing commit: `da46ab0` (`Refresh verified final ITCT artifacts`)
+- GitHub Pages workflow run `42409614289` completed successfully. The public project URL returned HTTP 200 and exposed the required authorship, explorer, results, and all six downloadable artifacts.
 - The local commit deliberately excludes three pre-existing dirty files that were already modified before this finalization: `dist/videos/05_figure6_ib_frontier_evidence_boundary.mp4`, `dist/videos/07_figure8_alternative_rule_trajectory.mp4`, and `generate-data.mjs`.
 
 ## Verified experimental configuration
