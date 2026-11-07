@@ -9,7 +9,7 @@ Validation date: 2026-11-08 (Asia/Taipei)
   1. Apple Rose Buhisan Alce (D14949006)
   2. Naveed Ullah (D14949002)
 - Other deliverables preserve the existing order: Naveed Ullah (D14949002), then Apple Rose Buhisan Alce (D14949006).
-- The repository notebook copy changes its first Markdown-cell credit from a single author to both contributors. Experimental code, settings, outputs, and figures were not changed for attribution.
+- The repository notebook copy lists both contributors in the requested notebook order: Naveed Ullah first, then Apple Rose Buhisan Alce. Experimental code, settings, outputs, and figures were not changed for attribution.
 
 ## Repository and deployment
 
