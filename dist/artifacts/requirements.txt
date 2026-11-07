@@ -1,0 +1,11 @@
+# Core scientific runtime for ITCT_Midterm_Notebook.ipynb
+# Supported target: Python 3.10+
+numpy>=1.24
+matplotlib>=3.7
+scipy>=1.10
+tqdm>=4.65
+plotly>=5.18
+ipywidgets>=8.1
+jupyterlab>=4.0
+nbformat>=5.9
+nbclient>=0.8

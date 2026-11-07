@@ -71,6 +71,8 @@ The supplied notebook and saved long-preset outputs support the following config
 - `dist/index.html`, `dist/styles.css`, `dist/app.js`, `dist/data.js`
 - `dist/assets/naveed/*`
 - `dist/artifacts/ITCT_Midterm_Notebook.ipynb`
+- `dist/artifacts/requirements.txt`
+- `dist/artifacts/RUN_NOTEBOOK.md`
 - `dist/artifacts/ITCT_Reproduction_Demonstration.mp4`
 - `dist/artifacts/ITCT_Video_Timestamped_Presenter_Script.pdf`
 - `dist/artifacts/ITCT_Final_Presentation.pptx`
@@ -82,7 +84,7 @@ The supplied notebook and saved long-preset outputs support the following config
 ### Automated project tests
 
 - Command: `MIDTERM_NEW_FILES/.venv/bin/python -m pytest MIDTERM_NEW_FILES/tests -q`
-- Result: **76 passed**, 1 third-party deprecation warning, 0 failures.
+- Result: **82 passed**, 1 third-party deprecation warning, 0 failures.
 
 ### Website
 
@@ -90,7 +92,7 @@ The supplied notebook and saved long-preset outputs support the following config
 - `app.js` passed Node syntax validation.
 - Headless Chrome desktop and mobile checks completed.
 - Play/pause, epoch slider, result tabs, and layer highlighting responded correctly.
-- All six local artifact links returned HTTP 200.
+- All eight local artifact links returned HTTP 200.
 - Browser console errors: 0.
 - Mobile viewport: document scroll width 390 px equals client width 390 px; no horizontal overflow.
 - Contributor order and IDs matched the mandatory website order.
@@ -108,6 +110,16 @@ The supplied notebook and saved long-preset outputs support the following config
 - 11 pages rendered to PNG and visually inspected.
 - Contains exact start/end timestamps for all 11 scenes, visible-element descriptions, word-for-word narration, mathematical interpretation, limitations, visual cues, and transitions.
 - Script duration matches the rendered MP4 duration.
+
+### Notebook portability
+
+- Every code cell passed Python syntax parsing, and the notebook contains no author-machine `/Users/`, `/home/`, or Windows user-directory path.
+- A fresh Python 3.13 virtual environment was created and populated only from the packaged `requirements.txt`; dependency installation completed successfully.
+- The notebook was then executed from an empty kernel with `NB_PRESET=quick`, `NB_USE_DRIVE=0`, and a noninteractive Matplotlib backend.
+- Result: **23 of 23 code cells completed**, 0 cell errors, 10 PNG figures, and 17 interactive explorer pages.
+- Elapsed clean execution time on the validation machine: 185.3 seconds.
+- The explorer exports embed Plotly directly and contain no external `<script src>` dependency, so the generated HTML pages can be opened offline.
+- `RUN_NOTEBOOK.md` includes direct Colab, macOS/Linux, and Windows PowerShell instructions and explains the quick, standard, long, and paper profiles.
 
 ### PowerPoint
 
@@ -143,3 +155,6 @@ The supplied notebook and saved long-preset outputs support the following config
 | `ITCT_Video_Timestamped_Presenter_Script.pdf` | `a2762cfe6f4645097ff15a97b2b8b14aaf68a5e1de0a8ee0fa5fc3815adaa3c3` |
 | `ITCT_Final_Presentation.pptx` | `1abdd03981e4c57c25029435f6e1abeac4f50ff54cdbee27c17c8f73958af596` |
 | `ITCT_Final_Report.pdf` | `92d09c8de9f84933c5d15623146a320e7efa935b37087e4813d63dd8dcf88a08` |
+| `ITCT_Midterm_Notebook.ipynb` | `71672c3422da1092cfd34e3f2373ed405d677e4a6bac507cc6620c0e6f14d7b0` |
+| `requirements.txt` | `fa1f9405b403fa01b8c23bb23093195ed0ec2feaf2520a7e056cd4adf960202f` |
+| `RUN_NOTEBOOK.md` | `68ef07a02ddbbd874eb0831ca884535271dfbd8eba5f3cb03c72e0ad033f8631` |
