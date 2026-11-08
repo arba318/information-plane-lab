@@ -19,7 +19,7 @@
         <a href="#method">Method</a>
         <a href="#interactive">Training trajectory</a>
         <a href="#results">Results</a>
-        <a href="#artifacts">Artifacts</a>
+        <a href="#videos">Videos</a>
       </div>
     </nav>
     <div id="top" class="hero-content">
@@ -178,6 +178,43 @@
       </div>
     </section>
 
+    <section id="videos" class="video-section">
+      <div class="section-heading">
+        <div><p class="eyebrow dark">DYNAMIC REPRODUCTION RESULTS</p><h2>Seven experiment trajectories</h2></div>
+        <p>These MP4s turn the saved experimental checkpoints into readable motion. The measured checkpoints are experimental evidence; smooth transitions between them are visual interpolation.</p>
+      </div>
+      <div class="video-grid">
+        <article class="video-card">
+          <video controls preload="metadata" playsinline aria-label="Figure 2 information-plane trajectory"><source src="videos/01_figure2_information_plane_trajectory.mp4" type="video/mp4"></video>
+          <div><p class="eyebrow dark">FIGURE 2</p><h3>Information-plane trajectory</h3><p>Follows each hidden layer through fitting and the later leftward motion measured by the binned estimator.</p></div>
+        </article>
+        <article class="video-card">
+          <video controls preload="metadata" playsinline aria-label="Figure 3 training-fraction trajectories"><source src="videos/02_figure3_training_fraction_trajectories.mp4" type="video/mp4"></video>
+          <div><p class="eyebrow dark">FIGURE 3</p><h3>Training-fraction comparison</h3><p>Compares how the representations evolve when the network is trained with different fractions of the available patterns.</p></div>
+        </article>
+        <article class="video-card">
+          <video controls preload="metadata" playsinline aria-label="Figure 4 gradient drift-to-diffusion transition"><source src="videos/03_figure4_gradient_drift_diffusion.mp4" type="video/mp4"></video>
+          <div><p class="eyebrow dark">FIGURE 4</p><h3>Gradient drift and diffusion</h3><p>Shows the gradient signal-to-noise transition used to distinguish the early drift regime from the fluctuation-dominated regime.</p></div>
+        </article>
+        <article class="video-card">
+          <video controls preload="metadata" playsinline aria-label="Figure 5 network-depth trajectories"><source src="videos/04_figure5_depth_trajectories.mp4" type="video/mp4"></video>
+          <div><p class="eyebrow dark">FIGURE 5</p><h3>Network-depth comparison</h3><p>Visualizes how learning speed and the final information-plane positions change across networks of different depths.</p></div>
+        </article>
+        <article class="video-card">
+          <video controls preload="metadata" playsinline aria-label="Figure 6 Information Bottleneck frontier and evidence boundary"><source src="videos/05_figure6_ib_frontier_evidence_boundary.mp4" type="video/mp4"></video>
+          <div><p class="eyebrow dark">FIGURE 6</p><h3>Information Bottleneck frontier</h3><p>Compares measured converged layer endpoints with the declared approximate IB frontier while keeping the evidence boundary visible.</p></div>
+        </article>
+        <article class="video-card">
+          <video controls preload="metadata" playsinline aria-label="Figure 7 sample-size trajectory"><source src="videos/06_figure7_sample_size_trajectory.mp4" type="video/mp4"></video>
+          <div><p class="eyebrow dark">FIGURE 7</p><h3>Sample-size trajectory</h3><p>Shows how increasing the training sample changes the predictive information retained by the learned representation.</p></div>
+        </article>
+        <article class="video-card">
+          <video controls preload="metadata" playsinline aria-label="Figure 8 alternative-rule trajectory"><source src="videos/07_figure8_alternative_rule_trajectory.mp4" type="video/mp4"></video>
+          <div><p class="eyebrow dark">FIGURE 8</p><h3>Alternative-rule trajectory</h3><p>Tests whether the same broad information-plane phases appear for the second synthetic decision rule and student architecture.</p></div>
+        </article>
+      </div>
+    </section>
+
     <section id="scorecard" class="scorecard-section">
       <div class="section-heading">
         <div><p class="eyebrow dark">CLAIM SCORECARD</p><h2>Results do not receive a single yes-or-no label</h2></div>
@@ -203,23 +240,7 @@
       </ol>
     </section>
 
-    <section id="artifacts" class="artifacts-section">
-      <div class="section-heading">
-        <div><p class="eyebrow dark">REPRODUCIBILITY RESOURCES</p><h2>Inspect the evidence, not only the conclusion</h2></div>
-        <p>The repository keeps the corrected project notebook, synchronized narration script, final presentation, and academic report together with this interface.</p>
-      </div>
-      <div class="artifact-grid">
-        <a href="artifacts/ITCT_Midterm_Notebook.ipynb"><strong>Jupyter notebook</strong><span>Implementation and saved outputs</span></a>
-        <a href="artifacts/requirements.txt"><strong>Python requirements</strong><span>Portable laptop and Colab dependency list</span></a>
-        <a href="artifacts/RUN_NOTEBOOK.md"><strong>Notebook run guide</strong><span>Colab, macOS, Linux, and Windows instructions</span></a>
-        <a href="artifacts/ITCT_Reproduction_Demonstration.mp4"><strong>Silent MP4</strong><span>10:14 experimental visualization</span></a>
-        <a href="artifacts/ITCT_Video_Timestamped_Presenter_Script.pdf"><strong>Presenter script</strong><span>Exact scene timestamps and narration</span></a>
-        <a href="artifacts/ITCT_Final_Presentation.pptx"><strong>PowerPoint</strong><span>34 slides with embedded speaker notes</span></a>
-        <a href="artifacts/ITCT_Final_Report.pdf"><strong>Academic report</strong><span>Methods, results, limits, and references</span></a>
-        <a href="artifacts/ITCT_Validation_Manifest.md"><strong>Validation manifest</strong><span>Tests, traceability, checksums, and evidence limits</span></a>
-        <a href="https://github.com/arba318/information-plane-lab" target="_blank" rel="noreferrer"><strong>Published source ↗</strong><span>Standalone website repository</span></a>
-        <a href="https://arxiv.org/abs/1703.00810" target="_blank" rel="noreferrer"><strong>Assigned paper ↗</strong><span>Shwartz-Ziv and Tishby (2017)</span></a>
-      </div>
+    <section class="credits-section">
       <div class="authors-block">
         <p class="eyebrow dark">CONTRIBUTORS</p>
         <h3>Apple Rose Buhisan Alce <span>D14949006</span></h3>
