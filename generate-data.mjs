@@ -1,8 +1,20 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const root = path.resolve(import.meta.dirname, '../..');
-const results = path.join(root, 'paper-reproduction/results');
+const candidateProjects = [
+  process.env.PAPER_REPRODUCTION_ROOT,
+  path.resolve(import.meta.dirname, '../../paper-reproduction'),
+  path.resolve(import.meta.dirname, '../../03_REPRODUCTION_CODE/paper-reproduction'),
+].filter(Boolean);
+const project = candidateProjects.find(candidate =>
+  fs.existsSync(path.join(candidate, 'results/metrics_aggregated.csv'))
+);
+if (!project) {
+  throw new Error(
+    'Cannot locate paper-reproduction. Set PAPER_REPRODUCTION_ROOT or preserve the submission folder structure.'
+  );
+}
+const results = path.join(project, 'results');
 const output = path.join(import.meta.dirname, 'dist/data.js');
 
 function csv(file) {
@@ -17,7 +29,8 @@ function csv(file) {
 function groupSeries(rows, keyName) {
   const grouped = {};
   for (const row of rows) {
-    const key = Number(row[keyName]).toFixed(keyName === 'fraction' ? 2 : 0);
+    const rawKey = row[keyName];
+    const key = typeof rawKey === 'number' ? Number(rawKey).toFixed(keyName === 'fraction' ? 2 : 0) : String(rawKey);
     grouped[key] ??= new Map();
     if (!grouped[key].has(row.epoch)) {
       grouped[key].set(row.epoch, {
@@ -31,6 +44,8 @@ function groupSeries(rows, keyName) {
       ix_sd: Number(row.ix_sd || 0), iy_sd: Number(row.iy_sd || 0),
       gradient_mean: Number(row.gradient_mean || row.gradient_mean_norm || 0),
       gradient_fluctuation: Number(row.gradient_fluctuation || 0),
+      normalized_gradient_mean: Number(row.normalized_gradient_mean || 0),
+      normalized_gradient_fluctuation: Number(row.normalized_gradient_fluctuation || 0),
       gradient_snr: Number(row.gradient_snr || 0),
     });
   }
@@ -42,7 +57,10 @@ const main = csv(path.join(results, 'metrics_aggregated.csv'));
 const f4 = csv(path.join(results, 'figure4/metrics_aggregated.csv'));
 const f5 = csv(path.join(results, 'figure5/metrics_aggregated.csv'));
 const f7 = csv(path.join(results, 'figure7/metrics_aggregated.csv'));
-const f8 = csv(path.join(results, 'figure8/metrics_aggregated.csv'));
+const f6Curve = csv(path.join(results, 'figure6_sota/ib_curve.csv'));
+const f6Layers = csv(path.join(results, 'figure6_sota/layer_endpoints_summary.csv'));
+const f8a = csv(path.join(results, 'figure8_sota/protocol_a_author_configuration/metrics_aggregated.csv')).map(r => ({...r, protocol:'A'}));
+const f8b = csv(path.join(results, 'figure8_sota/protocol_b_stochastic_gradient/metrics_aggregated.csv')).map(r => ({...r, protocol:'B'}));
 
 const payload = {
   generated: new Date().toISOString(),
@@ -51,11 +69,16 @@ const payload = {
   figure4: groupSeries(f4, 'fraction'),
   figure5: groupSeries(f5, 'depth'),
   figure6: {
-    status: 'method-only',
-    reason: 'The released repository does not include the original soft P(Y|X), spherical-harmonic rule parameters, or exact IB-solver output needed for an honest numerical reconstruction.'
+    curve: f6Curve,
+    layers: f6Layers,
+    status: 'measured-plus-surrogate',
+    reason: 'The red endpoints come from retrained networks. The blue frontier is a declared deterministic-IB approximation based on a calibrated nonparametric soft-label surrogate because the paper\'s original soft P(Y|X) and complete solver output were not released.'
   },
   figure7: groupSeries(f7, 'fraction'),
-  figure8: { '0.80': groupSeries(f8.map(r => ({ ...r, fraction: .8 })), 'fraction')['0.80'] },
+  figure8: {
+    A: groupSeries(f8a, 'protocol').A,
+    B: groupSeries(f8b, 'protocol').B,
+  },
 };
 
 fs.writeFileSync(output, `window.REPRO_DATA = ${JSON.stringify(payload)};\n`);

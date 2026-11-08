@@ -46,4 +46,9 @@ The notebook copy changes contributor attribution only. Experimental code, setti
 
 ## Deployment status
 
-The repository is locally prepared for GitHub Pages. Publication requires a valid GitHub login and explicit authorization of the intended repository. A public URL must not be claimed until it is opened and verified after deployment.
+This directory is the website's standalone repository, separate from the main reproduction-project repository.
+
+- Repository: https://github.com/arba318/information-plane-lab
+- GitHub Pages: https://arba318.github.io/information-plane-lab/
+
+The website contains only the interface, its saved evidence, and the artifacts intentionally exposed through the interface. The full experimental project remains independently versioned and is not embedded as this repository's source history.

@@ -15,9 +15,9 @@ Validation date: 2026-11-08 (Asia/Taipei)
 
 - Local repository: `/Users/applerose.alce/Documents/New project/sites/information-plane-lab`
 - Prepared local commit: `f9a6e7e` (`Finalize notebook-grounded ITCT research site`)
-- Repository URL: https://github.com/arba318/arba318.github.io
-- Published project directory: https://github.com/arba318/arba318.github.io/tree/main/itct-midterm
-- Live GitHub Pages URL: https://arba318.github.io/itct-midterm/
+- Repository URL: https://github.com/arba318/information-plane-lab
+- Published project directory: https://github.com/arba318/information-plane-lab/tree/main
+- Live GitHub Pages URL: https://arba318.github.io/information-plane-lab/
 - First verified deployed commit: `1f89125` (`Publish ITCT information-plane reproduction`)
 - Verified final artifact-bearing commit: `da46ab0` (`Refresh verified final ITCT artifacts`)
 - Verified notebook-portability commit: `2113053` (`Make notebook portable across laptops and Colab`)

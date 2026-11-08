@@ -73,7 +73,7 @@ The quick profile exercises every notebook section but is not expected to reprod
 
 Open the notebook directly:
 
-https://colab.research.google.com/github/arba318/arba318.github.io/blob/main/itct-midterm/artifacts/ITCT_Midterm_Notebook.ipynb
+https://colab.research.google.com/github/arba318/information-plane-lab/blob/main/dist/artifacts/ITCT_Midterm_Notebook.ipynb
 
 Choose **Runtime → Run all**. The setup cell installs only packages that are missing from the Colab runtime.
 
